@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from '@tanstack/react-router'
+import appCss from '../style.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -19,10 +20,12 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Simple App',
       },
-        { rel: 'icon', href: '/favicon.ico', type: 'image/x-icon' },
+      { name: 'description', content: 'A simple app using TanStack Router' },
+      { name: 'author', content: 'Saleh' },
     ],
+     links: [{ rel: 'stylesheet', href: appCss }],
   }),
   component: RootComponent,
 })
