@@ -19,8 +19,9 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'Simple App',
+        title: 'TanStack Start Starter',
       },
+        { rel: 'icon', href: '/favicon.ico', type: 'image/x-icon' },
     ],
   }),
   component: RootComponent,

@@ -1,18 +1,28 @@
-FROM node:20-alpine
+FROM node:20-bullseye
 
-WORKDIR /app
+# Set working directory
+WORKDIR /workspace
 
-# Copy package files
-COPY package*.json ./
+# Install git
+RUN apt-get update && apt-get install -y git sudo \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-RUN npm install
+# Create non-root user "vscode" (same as devcontainers convention)
+RUN useradd -ms /bin/bash vscode \
+ && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# Copy source code
-COPY . .
+# Switch to user
+USER vscode
+WORKDIR /workspace
 
-# Expose port
-EXPOSE 3000
+# Configure git + install Claude Code globally for this user
+RUN git config --global user.name "saleh" \
+ && git config --global user.email "salehtl@icloud.com" \
+ && npm install -g @anthropic-ai/claude-code --silent || true \
+ && git config --global init.defaultBranch master
 
-# Start development server
-CMD ["npm", "run", "dev"]
+# Add alias to bashrc of non-root user
+RUN echo 'alias claude="claude --dangerously-skip-permissions"' >> /home/vscode/.bashrc
+
+# Default command
+CMD ["bash"]

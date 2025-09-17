@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: mydb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/workspace
+      - ${HOME}/.ssh:/root/.ssh:cached
+      - /run/host-services/ssh-auth.sock:/ssh-agent
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+
+volumes:
+  db_data:
+  claude-config:
