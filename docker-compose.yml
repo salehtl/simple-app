@@ -7,22 +7,56 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-  frontend:
-    build: ./frontend
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydb -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web-dev:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      target: dev
+    working_dir: /workspace
     volumes:
-      - ./frontend:/workspace
-      - ${HOME}/.ssh:/root/.ssh:cached
-      - /run/host-services/ssh-auth.sock:/ssh-agent
+      - ./app:/workspace
+      - web_node_modules:/workspace/node_modules
     environment:
-      SSH_AUTH_SOCK: /ssh-agent
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-    ports:
-      - "3000:3000"
-    stdin_open: true
-    tty: true
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgres://user:pass@db:5432/mydb
+      BETTER_AUTH_SECRET: oCiBdPV10PISHucPETMSA805qHIGWlHO
+      AUTH_TRUST_HOST: "true"
+      APP_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["3000:3000"]
+    command: >
+      bash -lc "npm install && npm run dev -- --host --port 3000"
+    profiles: ["dev"]
+
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      target: prod-node
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://user:pass@db:5432/mydb
+      BETTER_AUTH_SECRET: JwUx1DXXpYwUcGg5IXGltn4bHW9AO5Ob
+      APP_URL: https://your-domain.tld
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["3000:3000"]
+    restart: unless-stopped
+    profiles: ["prod"]
 
 volumes:
   db_data:
-  claude-config:
+  web_node_modules:
