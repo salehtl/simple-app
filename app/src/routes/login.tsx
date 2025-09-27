@@ -25,7 +25,11 @@ function Login() {
       })
 
       if (result.error) {
-        setError(result.error.message)
+        if (result.error.status === 403) {
+          setError('Please verify your email address before logging in. Check your inbox for a verification email.')
+        } else {
+          setError(result.error.message)
+        }
       } else {
         router.navigate({ to: '/' })
       }
@@ -122,12 +126,25 @@ function Login() {
           </div>
         </form>
 
+        {/* Registration Link */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <a
+              href="/register"
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Create one here
+            </a>
+          </p>
+        </div>
+
         <div className="mt-6 p-4 bg-gray-50 rounded-md">
-          <h3 className="font-medium text-gray-700 mb-2">Preset Credentials:</h3>
+          <h3 className="font-medium text-gray-700 mb-2">Demo Credentials:</h3>
           <p className="text-sm text-gray-600">Email: demo@example.com</p>
           <p className="text-sm text-gray-600">Password: password123</p>
           <p className="text-xs text-gray-500 mt-2">
-            Click "Create Account" first if this is your first visit.
+            You can use this account to test the login functionality.
           </p>
         </div>
       </div>

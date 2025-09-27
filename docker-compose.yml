@@ -31,6 +31,9 @@ services:
       BETTER_AUTH_SECRET: oCiBdPV10PISHucPETMSA805qHIGWlHO
       AUTH_TRUST_HOST: "true"
       APP_URL: http://localhost:3000
+      EMAIL_USER: example@domain.com
+      EMAIL_APP_PASSWORD: example
+      EMAIL_FROM: example@domain.com
     depends_on:
       db:
         condition: service_healthy
